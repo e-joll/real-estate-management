@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\InquiryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InquiryRepository::class)]
 class Inquiry
@@ -27,6 +28,19 @@ class Inquiry
     #[ORM\ManyToOne(inversedBy: 'inquiries')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Property $property = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $subject = null;
+
+    public function __construct()
+    {
+        $this->setInquiredAt(new \DateTimeImmutable());
+    }
+
+    public function __toString(): string
+    {
+        return $this->subject;
+    }
 
     public function getId(): ?int
     {
@@ -77,6 +91,18 @@ class Inquiry
     public function setProperty(?Property $property): static
     {
         $this->property = $property;
+
+        return $this;
+    }
+
+    public function getSubject(): ?string
+    {
+        return $this->subject;
+    }
+
+    public function setSubject(string $subject): static
+    {
+        $this->subject = $subject;
 
         return $this;
     }

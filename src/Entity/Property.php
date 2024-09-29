@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 class Property
@@ -17,15 +18,28 @@ class Property
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Le titre ne doit pas dépasser {{ limit }} caractères.',
+    )]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\Range(
+        min: 0,
+        max: 99999999.99,
+        notInRangeMessage: 'Le prix doit se situé entre {{ min }}€ et {{ max }}€.',
+    )]
     private ?string $price = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'La lieu ne doit pas dépasser {{ limit }} caractères.',
+    )]
     private ?string $location = null;
 
     #[ORM\Column]
@@ -58,6 +72,12 @@ class Property
         $this->appointments = new ArrayCollection();
         $this->inquiries = new ArrayCollection();
         $this->features = new ArrayCollection();
+        $this->setListedAt(new \DateTimeImmutable());
+    }
+
+    public function __toString(): string
+    {
+        return $this->getTitle().' ('.$this->getLocation().')';
     }
 
     public function getId(): ?int

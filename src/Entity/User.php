@@ -6,12 +6,18 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cet email est déjà utilisé.',
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -35,9 +41,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Le prénom ne doit pas dépasser {{ limit }} caractères.',
+    )]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Le nom ne doit pas dépasser {{ limit }} caractères.',
+    )]
     private ?string $lastName = null;
 
     /**
@@ -70,6 +84,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->inquiries = new ArrayCollection();
         $this->properties = new ArrayCollection();
         $this->notifications = new ArrayCollection();
+        $this->setPassword('XXX');
+        //TODO:Revoir password -> notification
+    }
+
+    public function __toString(): string
+    {
+        return $this->getFirstName().' '.$this->getLastName();
     }
 
     public function getId(): ?int

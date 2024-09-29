@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\AppointmentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AppointmentRepository::class)]
 class Appointment
@@ -18,6 +19,10 @@ class Appointment
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Le statut ne doit pas dépasser {{ limit }} caractères.',
+    )]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'appointments')]
@@ -27,6 +32,16 @@ class Appointment
     #[ORM\ManyToOne(inversedBy: 'appointments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $buyer = null;
+
+    public function __construct()
+    {
+        $this->setStatus('A venir');
+    }
+
+    public function __toString(): string
+    {
+        return 'RDV du '.$this->date->format('d/m/Y H:i');
+    }
 
     public function getId(): ?int
     {

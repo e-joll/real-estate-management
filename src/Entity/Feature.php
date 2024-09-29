@@ -6,8 +6,15 @@ use App\Repository\FeatureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: FeatureRepository::class)]
+#[UniqueEntity(
+    fields: ['name'],
+    message: 'Caractéristique déjà créée.',
+)]
 class Feature
 {
     #[ORM\Id]
@@ -16,6 +23,10 @@ class Feature
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Le nom ne doit pas dépasser {{ limit }} caractères.',
+    )]
     private ?string $name = null;
 
     /**
@@ -27,6 +38,11 @@ class Feature
     public function __construct()
     {
         $this->properties = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName();
     }
 
     public function getId(): ?int
