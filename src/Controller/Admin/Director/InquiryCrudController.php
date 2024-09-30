@@ -3,14 +3,21 @@
 namespace App\Controller\Admin\Director;
 
 use App\Entity\Inquiry;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class InquiryCrudController extends AbstractCrudController
 {
+    public function __construct(private Security $security)
+    {
+    }
+
     public static function getEntityFqcn(): string
     {
         return Inquiry::class;
@@ -35,6 +42,20 @@ class InquiryCrudController extends AbstractCrudController
             TextField::new('subject', 'Sujet'),
             TextEditorField::new('message'),
         ];
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('property');
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $user = $this->security->getUser();
+        $entityInstance->setBuyer($user);
+
+        parent::persistEntity($entityManager, $entityInstance);
     }
 
 }
