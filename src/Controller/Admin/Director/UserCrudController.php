@@ -8,13 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ArrayFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -58,6 +59,22 @@ class UserCrudController extends AbstractCrudController
                     'ROLE_CUSTOMER' => 'danger',
                 ]),
         ];
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('firstName')
+            ->add('lastName')
+            ->add('email')
+            ->add(ArrayFilter::new('roles')
+                ->setChoices([
+                    'Directeur' => 'ROLE_DIRECTOR',
+                    'Agent' => 'ROLE_AGENT',
+                    'Client' => 'ROLE_CUSTOMER',
+                ])
+                ->canSelectMultiple()
+            );
     }
 
     public function configureActions(Actions $actions): Actions
