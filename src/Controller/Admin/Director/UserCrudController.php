@@ -2,7 +2,9 @@
 
 namespace App\Controller\Admin\Director;
 
+use App\Controller\Admin\Filter\UserRolesFilter;
 use App\Entity\User;
+use App\Form\Type\Admin\UserRolesFilterType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -67,14 +69,15 @@ class UserCrudController extends AbstractCrudController
             ->add('firstName')
             ->add('lastName')
             ->add('email')
-            ->add(ArrayFilter::new('roles')
+/*            ->add(ArrayFilter::new('roles')
                 ->setChoices([
                     'Directeur' => 'ROLE_DIRECTOR',
                     'Agent' => 'ROLE_AGENT',
                     'Client' => 'ROLE_CUSTOMER',
                 ])
                 ->canSelectMultiple()
-            );
+            )*/
+            ->add(UserRolesFilter::new('roles'));
     }
 
     public function configureActions(Actions $actions): Actions
