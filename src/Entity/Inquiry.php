@@ -16,6 +16,7 @@ class Inquiry
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
     private ?string $message = null;
 
     #[ORM\Column]
@@ -30,6 +31,7 @@ class Inquiry
     private ?Property $property = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $subject = null;
 
     public function __construct()

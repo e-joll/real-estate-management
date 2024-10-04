@@ -25,13 +25,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank]
     #[ORM\Column(length: 180)]
+    #[Assert\Email(message: 'Veuillez saisir une adresse e-mail valide.')]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Assert\NotBlank]
     private array $roles = [];
 
     /**
@@ -41,6 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Le prénom ne doit pas dépasser {{ limit }} caractères.',
@@ -48,6 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Le nom ne doit pas dépasser {{ limit }} caractères.',

@@ -23,6 +23,7 @@ class Feature
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Le nom ne doit pas dépasser {{ limit }} caractères.',

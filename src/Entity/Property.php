@@ -18,6 +18,7 @@ class Property
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Le titre ne doit pas dépasser {{ limit }} caractères.',
@@ -25,9 +26,11 @@ class Property
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotBlank]
     #[Assert\Range(
         min: 0,
         max: 99999999.99,
@@ -36,6 +39,7 @@ class Property
     private ?string $price = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         max: 255,
         maxMessage: 'La lieu ne doit pas dépasser {{ limit }} caractères.',
@@ -65,6 +69,7 @@ class Property
 
     #[ORM\ManyToOne(inversedBy: 'properties')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank]
     private ?User $agent = null;
 
     public function __construct()

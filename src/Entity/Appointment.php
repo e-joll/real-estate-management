@@ -16,9 +16,14 @@ class Appointment
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\GreaterThan(
+        'now',
+        message: 'La date doit être postérieure au {{ compared_value }}.',
+    )]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Le statut ne doit pas dépasser {{ limit }} caractères.',

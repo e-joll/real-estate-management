@@ -73,3 +73,6 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# PHPStorm
+/.idea/

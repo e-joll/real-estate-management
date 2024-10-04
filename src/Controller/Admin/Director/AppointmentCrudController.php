@@ -37,7 +37,10 @@ class AppointmentCrudController extends AbstractCrudController
     {
         return [
             AssociationField::new('property', 'Propriété'),
-            DateTimeField::new('date', 'Date'),
+            DateTimeField::new('date', 'Date')
+                ->setFormTypeOption('minutes', [0, 15, 30, 45])
+                ->setEmptyData('cheat to avoid Error'),
+            // TODO: Trouver une meilleure solution pour éviter l'erreur dans le cas où la date n'est pas renseignée
         ];
     }
 
