@@ -38,6 +38,9 @@ class Appointment
     #[ORM\JoinColumn(nullable: false)]
     private ?User $buyer = null;
 
+    #[ORM\Column(type: Types::TIME_IMMUTABLE)]
+    private ?\DateTimeImmutable $duration = null;
+
     public function __construct()
     {
         $this->setStatus('A venir');
@@ -97,6 +100,18 @@ class Appointment
     public function setBuyer(?User $buyer): static
     {
         $this->buyer = $buyer;
+
+        return $this;
+    }
+
+    public function getDuration(): ?\DateTimeImmutable
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(\DateTimeImmutable $duration): static
+    {
+        $this->duration = $duration;
 
         return $this;
     }

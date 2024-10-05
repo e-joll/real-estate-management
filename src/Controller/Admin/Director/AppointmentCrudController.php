@@ -4,11 +4,15 @@ namespace App\Controller\Admin\Director;
 
 use App\Entity\Appointment;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class AppointmentCrudController extends AbstractCrudController
@@ -41,6 +45,9 @@ class AppointmentCrudController extends AbstractCrudController
                 ->setFormTypeOption('minutes', [0, 15, 30, 45])
                 ->setEmptyData('cheat to avoid Error'),
             // TODO: Trouver une meilleure solution pour éviter l'erreur dans le cas où la date n'est pas renseignée
+            TimeField::new('duration','Durée'),
+            TextField::new('status', 'Statut')
+                ->onlyOnDetail()
         ];
     }
 
@@ -49,6 +56,12 @@ class AppointmentCrudController extends AbstractCrudController
         return $filters
             ->add('property')
             ->add('date');
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
