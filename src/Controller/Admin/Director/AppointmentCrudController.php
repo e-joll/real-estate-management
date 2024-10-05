@@ -8,7 +8,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -42,12 +44,12 @@ class AppointmentCrudController extends AbstractCrudController
         return [
             AssociationField::new('property', 'Propriété'),
             DateTimeField::new('date', 'Date')
-                ->setFormTypeOption('minutes', [0, 15, 30, 45])
-                ->setEmptyData('cheat to avoid Error'),
+                ->setEmptyData('cheat to avoid Error')
+                ->setFormTypeOption('view_timezone', $this->getUser()->getPreferredTimeZone()),
             // TODO: Trouver une meilleure solution pour éviter l'erreur dans le cas où la date n'est pas renseignée
             TimeField::new('duration','Durée'),
             TextField::new('status', 'Statut')
-                ->onlyOnDetail()
+                ->onlyOnDetail(),
         ];
     }
 
@@ -67,8 +69,31 @@ class AppointmentCrudController extends AbstractCrudController
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $user = $this->security->getUser();
+
+        // Set the buyer to the currently logged-in user
         $entityInstance->setBuyer($user);
 
+        // Convert the user-submitted date to UTC based on the user's preferred time zone
+        $date = $entityInstance->getDate()->format('Y-m-d H:i:s');
+        $preferredTimeZone = new \DateTimeZone($user->getPreferredTimeZone());
+        $datePreferredTimeZone = new \DateTime($date, $preferredTimeZone);
+        $dateUTC = $datePreferredTimeZone->setTimezone(new \DateTimeZone('UTC'));
+        $entityInstance->setDate($dateUTC);
+
         parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $user = $this->security->getUser();
+
+        // Convert the user-submitted date to UTC based on the user's preferred time zone
+        $date = $entityInstance->getDate()->format('Y-m-d H:i:s');
+        $preferredTimeZone = new \DateTimeZone($user->getPreferredTimeZone());
+        $datePreferredTimeZone = new \DateTime($date, $preferredTimeZone);
+        $dateUTC = $datePreferredTimeZone->setTimezone(new \DateTimeZone('UTC'));
+        $entityInstance->setDate($dateUTC);
+
+        parent::updateEntity($entityManager, $entityInstance);
     }
 }

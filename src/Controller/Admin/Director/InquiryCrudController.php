@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -41,6 +42,9 @@ class InquiryCrudController extends AbstractCrudController
             AssociationField::new('property', 'Propriété'),
             TextField::new('subject', 'Sujet'),
             TextEditorField::new('message'),
+            DateTimeField::new('inquiredAt')
+                ->setFormTypeOption('view_timezone', $this->getUser()->getPreferredTimeZone())
+                ->onlyOnIndex(),
         ];
     }
 

@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TimezoneField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -58,6 +59,8 @@ class UserCrudController extends AbstractCrudController
                     'ROLE_AGENT' => 'success',
                     'ROLE_CUSTOMER' => 'danger',
                 ]),
+            TimezoneField::new('preferredTimeZone', 'Fuseau horaire')
+                ->setValue('Europe/Paris')
         ];
     }
 

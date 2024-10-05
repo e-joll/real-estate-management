@@ -83,6 +83,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'recipient')]
     private Collection $notifications;
 
+    #[ORM\Column(length: 255)]
+    private ?string $preferredTimeZone = null;
+
     public function __construct()
     {
         $this->appointments = new ArrayCollection();
@@ -313,6 +316,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $notification->setRecipient(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPreferredTimeZone(): ?string
+    {
+        return $this->preferredTimeZone;
+    }
+
+    public function setPreferredTimeZone(string $preferredTimeZone): static
+    {
+        $this->preferredTimeZone = $preferredTimeZone;
 
         return $this;
     }
