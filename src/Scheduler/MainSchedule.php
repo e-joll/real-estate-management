@@ -2,13 +2,15 @@
 
 namespace App\Scheduler;
 
+use App\Scheduler\Message\SendAppointmentNotifications;
+use App\Scheduler\Message\UpdateAppointmentStatuses;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
-#[AsSchedule]
+#[AsSchedule('default')]
 final class MainSchedule implements ScheduleProviderInterface
 {
     public function __construct(
@@ -20,8 +22,8 @@ final class MainSchedule implements ScheduleProviderInterface
     {
         return (new Schedule())
             ->add(
-                // @TODO - Create a Message to schedule
-                // RecurringMessage::every('1 hour', new App\Message\Message()),
+                RecurringMessage::every('5 seconds', new UpdateAppointmentStatuses()),
+                RecurringMessage::every('5 seconds', new SendAppointmentNotifications()),
             )
             ->stateful($this->cache)
         ;

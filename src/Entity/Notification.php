@@ -30,6 +30,12 @@ class Notification
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    public function __construct()
+    {
+        $this->setRead(false);
+        $this->setCreatedAt(new \DateTimeImmutable());
+    }
+
     public function __toString(): string
     {
         return $this->title;
