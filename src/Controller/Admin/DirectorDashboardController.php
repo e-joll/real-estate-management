@@ -14,15 +14,13 @@ use App\Entity\Inquiry;
 use App\Entity\Notification;
 use App\Entity\Property;
 use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-class DirectorDashboardController extends AbstractDashboardController
+#[IsGranted('ROLE_DIRECTOR')]
+class DirectorDashboardController extends DashboardController
 {
     #[Route('/admin', name: 'admin')]
     public function index(): Response
@@ -46,12 +44,6 @@ class DirectorDashboardController extends AbstractDashboardController
         return $this->render('admin/admin_dashboard.html.twig');
     }
 
-    public function configureDashboard(): Dashboard
-    {
-        return Dashboard::new()
-            ->setTitle('Gestion immobilière');
-    }
-
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
@@ -67,10 +59,5 @@ class DirectorDashboardController extends AbstractDashboardController
             ->setController(AppointmentCrudController::class);
         yield MenuItem::linkToCrud('Notifications', 'fas fa-bell', Notification::class)
             ->setController(NotificationCrudController::class);
-    }
-
-    public function configureCrud(): Crud
-    {
-        return parent::configureCrud()->setTimezone($this->getUser()->getPreferredTimeZone());
     }
 }
