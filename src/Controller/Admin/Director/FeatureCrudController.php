@@ -6,7 +6,10 @@ use App\Entity\Feature;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted(new Expression('is_granted("ROLE_AGENT") or is_granted("ROLE_DIRECTOR")'))]
 class FeatureCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string

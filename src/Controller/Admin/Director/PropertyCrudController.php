@@ -6,6 +6,8 @@ use App\Entity\Property;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -18,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 
 class PropertyCrudController extends AbstractCrudController
@@ -49,7 +52,9 @@ class PropertyCrudController extends AbstractCrudController
         return [
             IdField::new('id')
                 ->onlyOnForms()
-                ->setDisabled(),
+                ->setDisabled()
+                ->setPermission('ROLE_AGENT')
+                ->setPermission('ROLE_DIRECTOR'),
             TextField::new('title', 'Titre'),
             TextEditorField::new('description')
                 ->setTemplatePath('admin/content_text_editor_field.html.twig'),
@@ -64,7 +69,7 @@ class PropertyCrudController extends AbstractCrudController
                 ),
             AssociationField::new('features', 'Caractéristiques')
                 ->setFormTypeOptions([
-                    'by_reference' => false, // Important pour la gestion des collections
+                    'by_reference' => false, // Important for collection management
                 ])
                 ->hideOnIndex(),
             ArrayField::new('features', 'Caractéristiques')
@@ -82,6 +87,17 @@ class PropertyCrudController extends AbstractCrudController
                 ->setChoices($this->getUserAgentChoices()))
             ->add('price')
             ->add('features');
+        // TODO: Improve features filter
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->setPermission(Action::NEW, new Expression('is_granted("ROLE_AGENT") or is_granted("ROLE_DIRECTOR")'))
+            ->setPermission(Action::EDIT, new Expression('is_granted("ROLE_AGENT") or is_granted("ROLE_DIRECTOR")'))
+            ->setPermission(Action::DELETE, new Expression('is_granted("ROLE_AGENT") or is_granted("ROLE_DIRECTOR")'))
+            ->setPermission(Action::BATCH_DELETE, new Expression('is_granted("ROLE_AGENT") or is_granted("ROLE_DIRECTOR")'));
     }
 
     private function getUserAgentChoices(): array

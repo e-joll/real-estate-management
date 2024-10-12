@@ -11,6 +11,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -19,6 +21,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class AppointmentCrudController extends AbstractCrudController
 {
@@ -39,12 +43,13 @@ class AppointmentCrudController extends AbstractCrudController
             ->setPageTitle(CRUD::PAGE_NEW, 'Créer un nouveau %entity_label_singular%')
             ->setPageTitle(CRUD::PAGE_DETAIL, fn (Appointment $appointment) => sprintf('<b>%s</b>', $appointment))
             ->setPageTitle(CRUD::PAGE_EDIT, fn (Appointment $appointment) => sprintf('Modifier <b>%s</b>', $appointment))
-            ->setPageTitle(CRUD::PAGE_INDEX, 'Liste des %entity_label_plural%');
+            ->setPageTitle(CRUD::PAGE_INDEX, 'Liste des %entity_label_plural%')
+            ->setDefaultSort(['date' => 'DESC']);
     }
 
     public function configureFields(string $pageName): iterable
     {
-        return [
+        $fields = [
             AssociationField::new('property', 'Propriété'),
             // TODO: Trouver une meilleure solution pour éviter l'erreur dans le cas où la date n'est pas renseignée
             DateTimeField::new('date', 'Date')
@@ -63,8 +68,13 @@ class AppointmentCrudController extends AbstractCrudController
                     'Passé' => 'danger',
                 ])
                 ->hideOnForm(),
-            AssociationField::new('buyer', 'Acheteur')
         ];
+
+        if (!$this->security->isGranted('ROLE_CUSTOMER')) {
+            $fields[] = AssociationField::new('buyer', 'Acheteur');
+        }
+
+        return $fields;
     }
 
     public function configureFilters(Filters $filters): Filters
@@ -77,7 +87,11 @@ class AppointmentCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->disable(Action::EDIT)
+            ->setPermission(Action::NEW, 'ROLE_CUSTOMER')
+            ->setPermission(Action::DELETE, 'ROLE_CUSTOMER')
+            ->setPermission(Action::BATCH_DELETE, 'ROLE_CUSTOMER');
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -94,12 +108,43 @@ class AppointmentCrudController extends AbstractCrudController
     {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
-        if ($this->isGranted('ROLE_CLIENT') or $this->isGranted('ROLE_CUSTOMER')) {
-            $user = $this->getUser();
+        $user = $this->getUser();
+
+        if ($this->isGranted('ROLE_CUSTOMER')) {
             $queryBuilder->andWhere('entity.buyer = :user')
+                ->setParameter('user', $user);
+        } elseif ($this->isGranted('ROLE_AGENT')) {
+            $queryBuilder->join('entity.property', 'p')
+                ->andWhere('p.agent = :user')
                 ->setParameter('user', $user);
         }
 
         return $queryBuilder;
+    }
+
+    public function detail(AdminContext $context): KeyValueStore|Response
+    {
+        $user = $this->getUser();
+        $appointment = $context->getEntity()->getInstance();
+
+        if ($this->security->isGranted('ROLE_CUSTOMER') && $appointment->getBuyer() !== $user) {
+            throw $this->createAccessDeniedException();
+        } elseif ($this->security->isGranted('ROLE_AGENT') && $appointment->getProperty()->getAgent() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return parent::detail($context);
+    }
+
+    public function delete(AdminContext $context): KeyValueStore|RedirectResponse|Response
+    {
+        $user = $this->getUser();
+        $inquiry = $context->getEntity()->getInstance();
+
+        if ($inquiry->getBuyer() !== $user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return parent::delete($context);
     }
 }

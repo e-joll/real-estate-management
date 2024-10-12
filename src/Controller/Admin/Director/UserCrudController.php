@@ -17,8 +17,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimezoneField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -75,12 +77,14 @@ class UserCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $resetPassword = Action::new('resetPassword', 'Réinitialiser le mot de passe', 'fa fa-user-lock')
-            ->linkToCrudAction('resetPassword');
+        $RESET_PASSWORD_ACTION = 'resetPassword';
+        $resetPassword = Action::new($RESET_PASSWORD_ACTION, 'Réinitialiser le mot de passe', 'fa fa-user-lock')
+            ->linkToCrudAction($RESET_PASSWORD_ACTION);
 
         return $actions
             ->add(Crud::PAGE_INDEX, $resetPassword)
-            ->add(Crud::PAGE_DETAIL, $resetPassword);
+            ->add(Crud::PAGE_DETAIL, $resetPassword)
+            ->setPermission($RESET_PASSWORD_ACTION, 'ROLE_DIRECTOR');
     }
 
     public function resetPassword(AdminContext $adminContext, EntityManagerInterface $entityManager , UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
