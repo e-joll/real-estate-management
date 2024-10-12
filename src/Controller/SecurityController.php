@@ -35,7 +35,7 @@ class SecurityController extends AbstractController
     public function redirectBasedOnRole(): RedirectResponse
     {
         if ($this->isGranted('ROLE_DIRECTOR')) {
-            return new RedirectResponse($this->generateUrl('admin'));
+            return new RedirectResponse($this->generateUrl('director_dashboard'));
         } elseif ($this->isGranted('ROLE_AGENT')) {
             return new RedirectResponse($this->generateUrl('agent_dashboard'));
         } elseif ($this->isGranted('ROLE_CUSTOMER')) {

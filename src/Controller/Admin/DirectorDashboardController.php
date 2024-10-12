@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_DIRECTOR')]
 class DirectorDashboardController extends DashboardController
 {
-    #[Route('/admin', name: 'admin')]
+    #[Route('/director', name: 'director_dashboard')]
     public function index(): Response
     {
         // return parent::index();
