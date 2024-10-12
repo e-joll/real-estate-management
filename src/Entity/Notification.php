@@ -32,7 +32,7 @@ class Notification
 
     public function __construct()
     {
-        $this->setRead(false);
+        $this->setIsRead(false);
         $this->setCreatedAt(new \DateTimeImmutable());
     }
 
@@ -63,7 +63,7 @@ class Notification
         return $this->isRead;
     }
 
-    public function setRead(bool $isRead): static
+    public function setIsRead(bool $isRead): static
     {
         $this->isRead = $isRead;
 
