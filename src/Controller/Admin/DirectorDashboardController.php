@@ -49,14 +49,14 @@ class DirectorDashboardController extends DashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-user', User::class)
             ->setController(UserCrudController::class);
+        yield MenuItem::linkToCrud('Propriétés', 'fas fa-city', Property::class)
+            ->setController(PropertyCrudController::class);
         yield MenuItem::linkToCrud('Caractéristiques', 'fas fa-cogs', Feature::class)
             ->setController(FeatureCrudController::class);
-        yield MenuItem::linkToCrud('Propriétés', 'fas fa-home', Property::class)
-            ->setController(PropertyCrudController::class);
-        yield MenuItem::linkToCrud('Demandes', 'fas fa-question-circle', Inquiry::class)
-            ->setController(InquiryCrudController::class);
         yield MenuItem::linkToCrud('Rendez-vous', 'fas fa-calendar', Appointment::class)
             ->setController(AppointmentCrudController::class);
+        yield MenuItem::linkToCrud('Demandes', 'fas fa-question-circle', Inquiry::class)
+            ->setController(InquiryCrudController::class);
         yield MenuItem::linkToCrud('Notifications', 'fas fa-bell', Notification::class)
             ->setController(NotificationCrudController::class);
     }
