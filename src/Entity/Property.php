@@ -32,9 +32,9 @@ class Property
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Assert\NotBlank]
     #[Assert\Range(
+        notInRangeMessage: 'Le prix doit se situé entre {{ min }}€ et {{ max }}€.',
         min: 0,
         max: 99999999.99,
-        notInRangeMessage: 'Le prix doit se situé entre {{ min }}€ et {{ max }}€.',
     )]
     private ?string $price = null;
 
