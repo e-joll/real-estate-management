@@ -15,7 +15,7 @@ class Purchase
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'purchases')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'purchases')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $buyer = null;
 
@@ -35,12 +35,14 @@ class Purchase
     /**
      * @var Collection<int, Document>
      */
-    #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'purchase', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'purchase', cascade: ['persist'], orphanRemoval: true)]
     private Collection $documents;
 
     public function __construct()
     {
         $this->documents = new ArrayCollection();
+        $this->setCreatedAt(new \DateTimeImmutable());
+        $this->setStatus('En cours');
     }
 
     public function getId(): ?int
