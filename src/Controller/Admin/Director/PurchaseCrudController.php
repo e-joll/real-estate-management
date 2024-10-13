@@ -41,6 +41,13 @@ class PurchaseCrudController extends AbstractCrudController
                 ->setFormTypeOption('entry_type', DocumentType::class),
         ];
     }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return parent::configureCrud($crud)
+            ->overrideTemplate('crud/new', 'admin/crud/new.html.twig');
+    }
+
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $buyer = $this->userRepository->findOneBy(['email' => $entityInstance->getBuyer()->getEmail()]);
