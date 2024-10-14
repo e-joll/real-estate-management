@@ -11,16 +11,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const suggestionsContainer = document.createElement('div');
     suggestionsContainer.id = 'buyer-suggestions';
     suggestionsContainer.style.zIndex = '1000';
-    suggestionsContainer.className = 'list-group position-absolute';
-    document.querySelector('.form-widget').appendChild(suggestionsContainer);
+    suggestionsContainer.style.maxHeight = '200px';
+    suggestionsContainer.className = 'list-group position-relative overflow-y-scroll';
 
-    const updateBuyerSuggestions = () => {
+    const updateBuyerSuggestions = (event) => {
         const queryParams = new URLSearchParams({
             id: fields.id.value,
             email: fields.email.value,
             firstName: fields.firstName.value,
             lastName: fields.lastName.value
         });
+
+        document.querySelector(`#${event.target.id}`).parentElement.appendChild(suggestionsContainer);
 
         fetch(`api/buyers?${queryParams.toString()}`)
             .then(response => response.json())
@@ -29,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (data.length > 0) {
                     suggestionsContainer.style.display = 'block'; // Display the container if suggestions exist
+
 
                     data.forEach(buyer => {
                         const div = document.createElement('a');
@@ -51,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     for (const fieldKey in fields) {
-        fields[fieldKey].addEventListener('input', updateBuyerSuggestions);
+        fields[fieldKey].addEventListener('input', (event) => { updateBuyerSuggestions(event)});
     }
 
     // Hide suggestions when clicking outside
@@ -61,5 +64,3 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-
-// TODO: Revoir affichage des suggestions
