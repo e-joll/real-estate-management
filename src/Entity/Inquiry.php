@@ -20,7 +20,7 @@ class Inquiry
     private ?string $message = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $inquiredAt = null;
+    private ?\DateTime $inquiredAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'inquiries')]
     #[ORM\JoinColumn(nullable: false)]
@@ -36,7 +36,7 @@ class Inquiry
 
     public function __construct()
     {
-        $this->setInquiredAt(new \DateTimeImmutable());
+        $this->setInquiredAt(new \DateTime());
     }
 
     public function __toString(): string
@@ -61,12 +61,12 @@ class Inquiry
         return $this;
     }
 
-    public function getInquiredAt(): ?\DateTimeImmutable
+    public function getInquiredAt(): ?\DateTime
     {
         return $this->inquiredAt;
     }
 
-    public function setInquiredAt(\DateTimeImmutable $inquiredAt): static
+    public function setInquiredAt(\DateTime $inquiredAt): static
     {
         $this->inquiredAt = $inquiredAt;
 

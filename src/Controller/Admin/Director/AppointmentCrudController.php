@@ -20,7 +20,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -81,7 +83,9 @@ class AppointmentCrudController extends AbstractCrudController
     {
         return $filters
             ->add('property')
-            ->add('date');
+            ->add(DateTimeFilter::new('date')
+                ->setFormTypeOption('value_type', DateType::class)
+            );
     }
 
     public function configureActions(Actions $actions): Actions
