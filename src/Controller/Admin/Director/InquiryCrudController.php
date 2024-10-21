@@ -68,7 +68,8 @@ class InquiryCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('property');
+            ->add('property')
+            ->add('inquiredAt');
     }
 
     public function configureActions(Actions $actions): Actions
