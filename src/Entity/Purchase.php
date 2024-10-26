@@ -45,6 +45,11 @@ class Purchase
         $this->setStatus('En cours');
     }
 
+    public function __toString(): string
+    {
+        return $this->getProperty() . '-' . $this->getBuyer();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
