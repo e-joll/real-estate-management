@@ -5,6 +5,7 @@ namespace App\Form\Type;
 use App\Entity\Document;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,7 +15,12 @@ class DocumentType extends AbstractType
     {
         $builder
             ->add('name', TextType::class)
-            ->add('status', TextType::class);
+            ->add('status', ChoiceType::class, [
+                'choices' => [
+                    'En attente de signature' => 'en_attente',
+                    'Signé' => 'signe',
+                ]
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
