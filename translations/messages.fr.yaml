@@ -1,0 +1,6 @@
+action:
+  reset_password: Réinitialiser le mot de passe
+
+reset_password_modal:
+    title: Voulez-vous réinitialiser ce mot de passe ?
+    content: Cette action est irréversible.

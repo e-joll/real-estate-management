@@ -1,0 +1,12 @@
+{# templates/admin/crud/edit_user.html.twig #}
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block configured_javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/confirm_reset_password.js') }}"></script>
+{% endblock %}
+
+{% block delete_form %}
+    {{ parent() }}
+    {{ include('admin/crud/includes/_reset_password_form.html.twig', { entity_id: entity.primaryKeyValue }, with_context = false) }}
+{% endblock delete_form %}
