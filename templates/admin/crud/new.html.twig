@@ -1,0 +1,7 @@
+{# templates/admin/crud/new.html.twig #}
+{% extends '@EasyAdmin/crud/new.html.twig' %}
+
+{% block configured_javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/purchase_buyer_autocomplete.js') }}"></script>
+{% endblock %}

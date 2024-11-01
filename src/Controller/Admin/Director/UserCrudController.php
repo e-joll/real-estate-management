@@ -45,7 +45,8 @@ class UserCrudController extends AbstractCrudController
             ->setPageTitle(CRUD::PAGE_NEW, 'Créer un nouvel %entity_label_singular%')
             ->setPageTitle(CRUD::PAGE_DETAIL, fn (User $user) => sprintf('<b>%s</b>', $user))
             ->setPageTitle(CRUD::PAGE_EDIT, fn (User $user) => sprintf('Modifier <b>%s</b>', $user))
-            ->setPageTitle(CRUD::PAGE_INDEX, 'Liste des %entity_label_plural%');
+            ->setPageTitle(CRUD::PAGE_INDEX, 'Liste des %entity_label_plural%')
+            ->overrideTemplate('crud/edit', 'admin/crud/edit_user.html.twig');
     }
 
 
@@ -89,11 +90,17 @@ class UserCrudController extends AbstractCrudController
 
         $RESET_PASSWORD_ACTION = 'resetPassword';
         $resetPassword = Action::new($RESET_PASSWORD_ACTION, 'Réinitialiser le mot de passe', 'fa fa-user-lock')
-            ->linkToCrudAction($RESET_PASSWORD_ACTION);
+            ->linkToCrudAction($RESET_PASSWORD_ACTION)
+            ->setHtmlAttributes([
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#modal-reset-password'
+            ]);
 
         return $actions
-            ->add(Crud::PAGE_INDEX, $resetPassword)
-            ->add(Crud::PAGE_DETAIL, $resetPassword)
+//            ->add(Crud::PAGE_INDEX, $resetPassword)
+//            ->add(Crud::PAGE_DETAIL, $resetPassword)
+            ->add(Crud::PAGE_EDIT, $resetPassword)
+            ->add(Crud::PAGE_EDIT, Action::DELETE)
             ->disable(Action::BATCH_DELETE)
             ->setPermission($RESET_PASSWORD_ACTION, 'ROLE_DIRECTOR')
             ->setPermission(Action::INDEX, new Expression('is_granted("ROLE_AGENT") or is_granted("ROLE_DIRECTOR")'))
@@ -137,6 +144,7 @@ class UserCrudController extends AbstractCrudController
         $user = $adminContext->getEntity()->getInstance();
 
         $user->setPassword($passwordHasher->hashPassword($user, '123'));
+        $entityManager->persist($user);
         $entityManager->flush();
 
         return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());

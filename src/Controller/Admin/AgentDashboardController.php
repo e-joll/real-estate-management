@@ -7,12 +7,14 @@ use App\Controller\Admin\Director\FeatureCrudController;
 use App\Controller\Admin\Director\InquiryCrudController;
 use App\Controller\Admin\Director\NotificationCrudController;
 use App\Controller\Admin\Director\PropertyCrudController;
+use App\Controller\Admin\Director\PurchaseCrudController;
 use App\Controller\Admin\Director\UserCrudController;
 use App\Entity\Appointment;
 use App\Entity\Feature;
 use App\Entity\Inquiry;
 use App\Entity\Notification;
 use App\Entity\Property;
+use App\Entity\Purchase;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -48,6 +50,8 @@ class AgentDashboardController extends DashboardController
             ->setController(AppointmentCrudController::class);
         yield MenuItem::linkToCrud('Demandes', 'fas fa-question-circle', Inquiry::class)
             ->setController(InquiryCrudController::class);
+        yield MenuItem::linkToCrud('Achats', 'fas fa-cart-shopping', Purchase::class)
+            ->setController(PurchaseCrudController::class);
         yield MenuItem::linkToCrud('Notifications', 'fas fa-bell', Notification::class)
             ->setController(NotificationCrudController::class);
     }

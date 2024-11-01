@@ -72,6 +72,9 @@ class Property
     #[Assert\NotBlank]
     private ?User $agent = null;
 
+    #[ORM\OneToOne(mappedBy: 'property', cascade: ['persist', 'remove'])]
+    private ?Purchase $purchase = null;
+
     public function __construct()
     {
         $this->appointments = new ArrayCollection();
@@ -245,6 +248,23 @@ class Property
     public function setAgent(?User $agent): static
     {
         $this->agent = $agent;
+
+        return $this;
+    }
+
+    public function getPurchase(): ?Purchase
+    {
+        return $this->purchase;
+    }
+
+    public function setPurchase(Purchase $purchase): static
+    {
+        // set the owning side of the relation if necessary
+        if ($purchase->getProperty() !== $this) {
+            $purchase->setProperty($this);
+        }
+
+        $this->purchase = $purchase;
 
         return $this;
     }

@@ -77,9 +77,9 @@ class PropertyCrudController extends AbstractCrudController
                 ->setFormTypeOptions([
                     'by_reference' => false, // Important for collection management
                 ])
-                ->hideOnIndex(),
+                ->onlyOnForms(),
             ArrayField::new('features', 'Caractéristiques')
-                ->onlyOnIndex(),
+                ->hideOnForm(),
         ];
     }
 

@@ -86,6 +86,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $preferredTimeZone = null;
 
+    /**
+     * @var Collection<int, Purchase>
+     */
+    #[ORM\OneToMany(targetEntity: Purchase::class, mappedBy: 'buyer')]
+    private Collection $purchases;
+
     public function __construct()
     {
         $this->appointments = new ArrayCollection();
@@ -94,6 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->notifications = new ArrayCollection();
         $this->setPassword('XXX');
         //TODO:Revoir password -> notification
+        $this->purchases = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -328,6 +335,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPreferredTimeZone(string $preferredTimeZone): static
     {
         $this->preferredTimeZone = $preferredTimeZone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Purchase>
+     */
+    public function getPurchases(): Collection
+    {
+        return $this->purchases;
+    }
+
+    public function addPurchase(Purchase $purchase): static
+    {
+        if (!$this->purchases->contains($purchase)) {
+            $this->purchases->add($purchase);
+            $purchase->setBuyer($this);
+        }
+
+        return $this;
+    }
+
+    public function removePurchase(Purchase $purchase): static
+    {
+        if ($this->purchases->removeElement($purchase)) {
+            // set the owning side to null (unless already changed)
+            if ($purchase->getBuyer() === $this) {
+                $purchase->setBuyer(null);
+            }
+        }
 
         return $this;
     }

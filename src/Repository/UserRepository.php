@@ -46,6 +46,26 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
     }
 
+    public function findByCriteria($id, $email, $firstName, $lastName)
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->andWhere('u.email LIKE :email')
+            ->setParameter('email', '%' . $email . '%')
+            ->andWhere('u.firstName LIKE :firstName')
+            ->setParameter('firstName', '%' . $firstName . '%')
+            ->andWhere('u.lastName LIKE :lastName')
+            ->setParameter('lastName', '%' . $lastName . '%')
+            ->andWhere('u.roles LIKE :roles')
+            ->setParameter('roles', '%ROLE_CUSTOMER%');
+
+        if ($id != "") {
+            $qb->andWhere('u.id = :id')
+                ->setParameter('id', $id);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     //    public function findOneBySomeField($value): ?User
     //    {
     //        return $this->createQueryBuilder('u')
