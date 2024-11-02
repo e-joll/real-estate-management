@@ -1,0 +1,12 @@
+{# templates/admin/crud/edit_user.html.twig #}
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block configured_javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/confirm_purchase.js') }}"></script>
+{% endblock %}
+
+{% block delete_form %}
+    {{ parent() }}
+    {{ include('admin/crud/includes/_save_and_confirm_purchase_form.html.twig', { entity_id: entity.primaryKeyValue }, with_context = false) }}
+{% endblock delete_form %}

@@ -1,0 +1,22 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{% trans_default_domain 'messages' %}
+<div id="modal-save-and-confirm" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>{{ 'save_and_confirm_purchase_modal.title'|trans }}</h4>
+                <p><span id="number-documents-signed"></span> / <span id="total_documents"></span> documents signés.</p>
+                <p>{{ 'save_and_confirm_purchase_modal.content'|trans }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                    <span class="btn-label">{{ 'action.cancel'|trans([], 'EasyAdminBundle') }}</span>
+                </button>
+
+                <button type="submit" data-bs-dismiss="modal" class="action-saveAndConfirm btn btn-danger action-save" name="ea[newForm][btn]" value="saveAndContinue" id="modal-save-and-confirm-button" form="edit-Purchase-form">
+                    <span class="btn-label">{{ 'action.save_and_continue'|trans([], 'EasyAdminBundle') }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
