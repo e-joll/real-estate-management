@@ -7,16 +7,15 @@ use App\Event\PurchaseCompletedEvent;
 use App\Form\Type\DocumentType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
+use function Symfony\Component\Translation\t;
 
 class PurchaseCrudController extends AbstractCrudController
 {
@@ -36,19 +35,44 @@ class PurchaseCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')
-                ->setDisabled(),
-            AssociationField::new('buyer')->renderAsEmbeddedForm(),
-            AssociationField::new('property'),
+            AssociationField::new('buyer', 'Acheteur')
+                ->renderAsEmbeddedForm(),
+            AssociationField::new('property', 'Propriété'),
             CollectionField::new('documents')
                 ->setFormTypeOption('entry_type', DocumentType::class),
+            ChoiceField::new('status', 'Statut')
+                ->setChoices([
+                    'En cours' => 'in_progress',
+                    'Acheté' => 'purchased',
+                ])
+                ->renderAsBadges([
+                    'in_progress' => 'info',
+                    'purchased' => 'success',
+                ])
         ];
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-            ->overrideTemplate('crud/new', 'admin/crud/new.html.twig');
+            ->overrideTemplate('crud/new', 'admin/crud/new.html.twig')
+            ->overrideTemplate('crud/edit', 'admin/crud/edit_purchase.html.twig');
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $SAVE_AND_CONFIRM = 'saveAndConfirm';
+        $saveAndConfirm = Action::new($SAVE_AND_CONFIRM, t('action.save_and_continue', domain: 'EasyAdminBundle'))
+            ->linkToCrudAction(Action::EDIT)
+            ->setHtmlAttributes([
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#modal-save-and-confirm',
+            ])
+            ->addCssClass('btn btn-primary')->displayAsButton();
+        return $actions
+            ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE)
+            ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_RETURN)
+            ->add(Crud::PAGE_EDIT, $saveAndConfirm);
     }
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -63,7 +87,7 @@ class PurchaseCrudController extends AbstractCrudController
         if (!empty($documents)) {
             $allDocumentsAreSigned = true;
             foreach ($documents as $document) {
-                if ($document->getStatus() != 'Signé') {
+                if ($document->getStatus() != 'signed') {
                     $allDocumentsAreSigned = false;
                 }
             }
@@ -82,7 +106,7 @@ class PurchaseCrudController extends AbstractCrudController
         if (!empty($documents)) {
             $allDocumentsAreSigned = true;
             foreach ($documents as $document) {
-                if ($document->getStatus() != 'signe') {
+                if ($document->getStatus() != 'signed') {
                     $allDocumentsAreSigned = false;
                 }
             }

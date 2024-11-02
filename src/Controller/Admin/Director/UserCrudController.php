@@ -13,6 +13,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Exception\ForbiddenActionException;
+use EasyCorp\Bundle\EasyAdminBundle\Exception\InsufficientEntityPermissionException;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -157,7 +159,7 @@ class UserCrudController extends AbstractCrudController
         $roles = $entityInstance->getRoles();
 
         if ($this->security->isGranted('ROLE_CUSTOMER') && !in_array('ROLE_AGENT', $roles)) {
-            throw $this->createAccessDeniedException();
+            throw new InsufficientEntityPermissionException($context);
         }
 
         return parent::detail($context);
@@ -169,7 +171,7 @@ class UserCrudController extends AbstractCrudController
         $roles = $entityInstance->getRoles();
 
         if ($this->security->isGranted('ROLE_AGENT') && in_array('ROLE_AGENT', $roles)) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenActionException($context);
         }
 
         return parent::edit($context);

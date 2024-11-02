@@ -35,16 +35,16 @@ class DocumentCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            AssociationField::new('purchase'),
+            AssociationField::new('purchase', 'Propriété'),
             TextField::new('name', 'Nom'),
             ChoiceField::new('status', 'Statut')
                 ->setChoices([
-                    'En attente de signature' => 'en_attente',
-                    'Signé' => 'signe',
+                    'En attente de signature' => 'waiting_for_signature',
+                    'Signé' => 'signed',
                 ])
                 ->renderAsBadges([
-                    'En attente de signature' => 'info',
-                    'Signé' => 'success',
+                    'waiting_for_signature' => 'info',
+                    'signed' => 'success',
                 ])
         ];
     }

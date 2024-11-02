@@ -3,11 +3,18 @@
 namespace App\Entity;
 
 use App\Repository\PurchaseRepository;
+use App\Validator as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: PurchaseRepository::class)]
+#[UniqueEntity(
+    fields: ['property'],
+    message: 'Cette propriété est déjà en cours d\'achat.',
+)]
+#[AppAssert\ApprovedPurchase()]
 class Purchase
 {
     #[ORM\Id]
