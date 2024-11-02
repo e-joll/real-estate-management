@@ -14,11 +14,14 @@ class DocumentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class)
+            ->add('name', TextType::class, [
+                'label' => 'Nom'
+            ])
             ->add('status', ChoiceType::class, [
+                'label' => 'Statut',
                 'choices' => [
-                    'En attente de signature' => 'en_attente',
-                    'Signé' => 'signe',
+                    'En attente de signature' => 'waiting_for_signature',
+                    'Signé' => 'signed',
                 ]
             ]);
     }

@@ -42,6 +42,15 @@ class PurchaseCrudController extends AbstractCrudController
             AssociationField::new('property'),
             CollectionField::new('documents')
                 ->setFormTypeOption('entry_type', DocumentType::class),
+            ChoiceField::new('status', 'Statut')
+                ->setChoices([
+                    'En cours' => 'in_progress',
+                    'Acheté' => 'purchased',
+                ])
+                ->renderAsBadges([
+                    'in_progress' => 'info',
+                    'purchased' => 'success',
+                ])
         ];
     }
 
@@ -63,7 +72,7 @@ class PurchaseCrudController extends AbstractCrudController
         if (!empty($documents)) {
             $allDocumentsAreSigned = true;
             foreach ($documents as $document) {
-                if ($document->getStatus() != 'Signé') {
+                if ($document->getStatus() != 'signed') {
                     $allDocumentsAreSigned = false;
                 }
             }
@@ -82,7 +91,7 @@ class PurchaseCrudController extends AbstractCrudController
         if (!empty($documents)) {
             $allDocumentsAreSigned = true;
             foreach ($documents as $document) {
-                if ($document->getStatus() != 'signe') {
+                if ($document->getStatus() != 'signed') {
                     $allDocumentsAreSigned = false;
                 }
             }
