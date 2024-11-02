@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\PurchaseRepository;
+use App\Validator as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PurchaseRepository::class)]
+#[AppAssert\ApprovedPurchase()]
 class Purchase
 {
     #[ORM\Id]
