@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Exception\ForbiddenActionException;
 use EasyCorp\Bundle\EasyAdminBundle\Exception\InsufficientEntityPermissionException;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -73,7 +74,9 @@ class UserCrudController extends AbstractCrudController
                     'ROLE_CUSTOMER' => 'danger',
                 ]),
             TimezoneField::new('preferredTimeZone', 'Fuseau horaire')
-                ->setValue('Europe/Paris')
+                ->setValue('Europe/Paris'),
+            BooleanField::new('isApproved', 'Approuvé')
+                ->setPermission('ROLE_DIRECTOR'),
         ];
     }
 
