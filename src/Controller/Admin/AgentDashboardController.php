@@ -46,12 +46,12 @@ class AgentDashboardController extends DashboardController
             ->setController(PropertyCrudController::class);
         yield MenuItem::linkToCrud('Caractéristiques', 'fas fa-cogs', Feature::class)
             ->setController(FeatureCrudController::class);
+        yield MenuItem::linkToCrud('Achats', 'fas fa-cart-shopping', Purchase::class)
+            ->setController(PurchaseCrudController::class);
         yield MenuItem::linkToCrud('Rendez-vous', 'fas fa-calendar', Appointment::class)
             ->setController(AppointmentCrudController::class);
         yield MenuItem::linkToCrud('Demandes', 'fas fa-question-circle', Inquiry::class)
             ->setController(InquiryCrudController::class);
-        yield MenuItem::linkToCrud('Achats', 'fas fa-cart-shopping', Purchase::class)
-            ->setController(PurchaseCrudController::class);
         yield MenuItem::linkToCrud('Notifications', 'fas fa-bell', Notification::class)
             ->setController(NotificationCrudController::class);
     }
