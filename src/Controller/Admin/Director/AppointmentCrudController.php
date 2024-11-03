@@ -57,7 +57,12 @@ class AppointmentCrudController extends AbstractCrudController
             DateTimeField::new('date', 'Date')
                 ->setEmptyData('cheat to avoid Error')
                 /*->setFormTypeOption('view_timezone', $this->getUser()->getPreferredTimeZone())*/,
-            TimeField::new('duration','Durée'),
+            TimeField::new('duration','Durée')
+                ->renderAsChoice()
+                ->setFormTypeOptions([
+                    'hours' => range(0,2),
+                    'minutes' => [0,30]
+                ]),
             ChoiceField::new('status', 'Statut')
                 ->setChoices([
                     'A venir' => 'A venir',
