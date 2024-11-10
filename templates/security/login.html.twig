@@ -50,13 +50,11 @@
                     Se connecter
                 </button>
             </form>
+            <a class="btn btn-light mt-2" href="{{ path('app_download') }}">
+                Téléchargements
+            </a>
         </div>
     </div>
-    <!-- Footer collé en bas si le contenu est insuffisant -->
-    <footer class="bg-dark text-white p-3 mt-auto">
-        <div class="container text-center">
-            <p class="m-0">&copy; 2024 Real Estate Management. Tous droits réservés.</p>
-        </div>
-    </footer>
+    {{ include('inc/footer.html.twig') }}
 </div>
 {% endblock %}
