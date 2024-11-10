@@ -21,7 +21,7 @@ class DownloadController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $codeValue = $form->get('code')->getData();
 
-            if (in_array($codeValue, ['123456', '456789']))
+            if (in_array($codeValue, ['123', '123456', '456789']))
             {
                 return $this->redirectToRoute('app_download_files', [
                     'codeValue' => $codeValue
@@ -53,6 +53,11 @@ class DownloadController extends AbstractController
             return $this->render('download/files.html.twig', [
                 'fileLink' => $fileLinkGenerator->generateSecureLink(2),
             ]);
+        } elseif ($codeValue == '123')
+        {
+            return $this->render('download/files.html.twig', [
+                'fileLink' => $fileLinkGenerator->generateSecureLink(3),
+            ]);
         }
 
         return $this->redirectToRoute('app_download');
@@ -69,9 +74,9 @@ class DownloadController extends AbstractController
         if (!$decodedData) {
             return new Response('Le lien est invalide ou expiré.', 403);
         } elseif ($decodedData['file'] == 1) {
-            return $this->file($this->getParameter('app.uploads_dir').'/cinebillets0522.pdf');
+            return $fileLinkGenerator->generateBinaryFileResponse($this->getParameter('app.uploads_dir').'/cinebillets0522.pdf');
         } elseif ($decodedData['file'] == 2) {
-            return $this->file($this->getParameter('app.uploads_dir').'/DALL_Ec2.jpg');
+            return $fileLinkGenerator->generateBinaryFileResponse($this->getParameter('app.uploads_dir').'/DALL_Ec2.jpg');
         } else {
             return new Response('Aucun fichier trouvé.', 403);
         }

@@ -3,12 +3,14 @@
 namespace App\Security;
 
 use phpDocumentor\Reflection\Types\This;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TemporaryFileLinkGenerator
 {
-    const EXPIRATION_TIME = 5;
-    
+    const EXPIRATION_TIME = 15;
+
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator
     )
@@ -52,5 +54,30 @@ class TemporaryFileLinkGenerator
         $expectedSignature = hash_hmac('sha256', $decodedData['file'] . $decodedData['expires'], $_ENV['ENCRYPTION_KEY']);
 
         return hash_equals($expectedSignature, $decodedData['token']) ? $decodedData : false;
+    }
+
+    public function generateBinaryFileResponse(string $filePath): BinaryFileResponse
+    {
+        if (!file_exists($filePath)) {
+            throw new \RuntimeException('Fichier non trouvé.');
+        }
+
+        $response = new BinaryFileResponse($filePath);
+
+        // Set cache headers to prevent caching of the response
+        $response->setPrivate();
+        $response->headers->add([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
+
+        // Force the file to download with a predefined filename
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            basename($filePath)
+        );
+
+        return $response;
     }
 }
