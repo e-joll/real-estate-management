@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -24,6 +25,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\File;
 
 
 class PropertyCrudController extends AbstractCrudController
@@ -80,6 +82,10 @@ class PropertyCrudController extends AbstractCrudController
                 ->onlyOnForms(),
             ArrayField::new('features', 'Caractéristiques')
                 ->hideOnForm(),
+            ImageField::new('Doc')
+                ->setFormTypeOption('mapped', false)
+                ->setUploadDir('uploads')
+                ->setCustomOption(ImageField::OPTION_FILE_CONSTRAINTS, [new File()])
         ];
     }
 
