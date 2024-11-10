@@ -17,6 +17,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Exception\ForbiddenActionException;
 use EasyCorp\Bundle\EasyAdminBundle\Exception\InsufficientEntityPermissionException;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimezoneField;
@@ -24,13 +25,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserCrudController extends AbstractCrudController
 {
     public function __construct(
-        private readonly Security $security
+        private readonly Security $security,
+        private readonly RequestStack $request
     )
     {
     }
@@ -55,7 +59,7 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
+        $fields = [
             IdField::new('id')
                 ->setDisabled(),
             TextField::new('email'),
@@ -78,6 +82,18 @@ class UserCrudController extends AbstractCrudController
             BooleanField::new('isApproved', 'Approuvé')
                 ->setPermission('ROLE_DIRECTOR'),
         ];
+
+        if (str_contains($this->request->getCurrentRequest()->query->get('crudControllerFqcn'), "UserCrudController")) {
+            $fieldSets = [
+                FormField::addFieldset('Aide pour remplir le formulaire')
+                    ->setHelp('<ol><li>1ere étape</li><li>2eme étape</li></ol>'),
+                FormField::addFieldset('Données'),
+            ];
+
+            return array_merge($fieldSets, $fields);
+        }
+
+        return $fields;
     }
 
     public function configureFilters(Filters $filters): Filters
