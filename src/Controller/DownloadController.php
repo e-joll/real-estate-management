@@ -23,9 +23,8 @@ class DownloadController extends AbstractController
 
             if (in_array($codeValue, ['123', '123456', '456789']))
             {
-                return $this->redirectToRoute('app_download_files', [
-                    'codeValue' => $codeValue
-                ]);
+                $request->getSession()->set('codeValue', $codeValue);
+                return $this->redirectToRoute('app_download_files');
             }
 
             return $this->redirectToRoute('app_download');
@@ -42,7 +41,7 @@ class DownloadController extends AbstractController
         TemporaryFileLinkGenerator $fileLinkGenerator
     ): Response
     {
-        $codeValue = $request->get('codeValue');
+        $codeValue = $request->getSession()->get('codeValue');
 
         if ($codeValue == '123456') {
             return $this->render('download/files.html.twig', [
@@ -63,13 +62,13 @@ class DownloadController extends AbstractController
         return $this->redirectToRoute('app_download');
     }
 
-    #[Route('/download/file/{signature}', name: 'app_download_file')]
+    #[Route('/download/file/{token}', name: 'app_download_file')]
     public function downloadFile(
-        string $signature,
+        string $token,
         TemporaryFileLinkGenerator $fileLinkGenerator
     ): Response
     {
-        $decodedData = $fileLinkGenerator->validateLink($signature);
+        $decodedData = $fileLinkGenerator->validateLink($token);
 
         if (!$decodedData) {
             return new Response('Le lien est invalide ou expiré.', 403);

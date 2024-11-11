@@ -24,24 +24,24 @@ class TemporaryFileLinkGenerator
         // Create data to include in the token (file id + expiration)
         $data = $fileId . $expirationTimestamp;
 
-        $token = hash_hmac('sha256', $data, $_ENV['ENCRYPTION_KEY']);
+        $signature = hash_hmac('sha256', $data, $_ENV['ENCRYPTION_KEY']);
 
-        $encodedSignature = urlencode(base64_encode(json_encode([
+        $token = urlencode(base64_encode(json_encode([
             'file' => $fileId,
             'expires' => $expirationTimestamp,
-            'token' => $token,
+            'signature' => $signature,
         ])));
 
         return $this->urlGenerator->generate('app_download_file', [
-            'signature' => $encodedSignature
+            'token' => $token
         ], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
-    public function validateLink(string $encodedSignature)
+    public function validateLink(string $token)
     {
-        $decodedData = json_decode(base64_decode(urldecode($encodedSignature), true), true);
+        $decodedData = json_decode(base64_decode(urldecode($token), true), true);
 
-        if (!$decodedData || !isset($decodedData['file'], $decodedData['expires'], $decodedData['token'])) {
+        if (!$decodedData || !isset($decodedData['file'], $decodedData['expires'], $decodedData['signature'])) {
             return false;
         }
 
@@ -53,7 +53,7 @@ class TemporaryFileLinkGenerator
         // Verify the token
         $expectedSignature = hash_hmac('sha256', $decodedData['file'] . $decodedData['expires'], $_ENV['ENCRYPTION_KEY']);
 
-        return hash_equals($expectedSignature, $decodedData['token']) ? $decodedData : false;
+        return hash_equals($expectedSignature, $decodedData['signature']) ? $decodedData : false;
     }
 
     public function generateBinaryFileResponse(string $filePath): BinaryFileResponse
