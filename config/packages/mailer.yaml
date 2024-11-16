@@ -1,4 +1,12 @@
 framework:
     mailer:
-#        dsn: '%env(MAILER_DSN)%'
-        dsn: 'null://null'
+        dsn: '%env(MAILER_DSN)%'
+
+when@dev:
+    framework:
+        mailer:
+            dsn: 'null://null'
+            envelope:
+                sender: 'fabien@example.com'
+            headers:
+                From: 'Fabien <fabien@example.com>'
