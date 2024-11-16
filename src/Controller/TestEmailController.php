@@ -9,7 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,6 +25,7 @@ class TestEmailController extends AbstractController
     #[Route('/mail/test', name: 'mail_test')]
     public function index(
         MailerInterface $mailer,
+        MessageBusInterface $messageBus,
         EmailService $emailService
     ): Response
     {
@@ -58,7 +62,14 @@ class TestEmailController extends AbstractController
 
 
         // Envoyer l'e-mail
-        $mailer->send($email);
+//        $mailer->send($email);
+
+        // Envoyer l'e-mail avec un délais
+        $message = new SendEmailMessage($email);
+        $seconds = 10;
+        $delay = 1000 * $seconds;
+
+        $messageBus->dispatch($message, [new DelayStamp($delay)]);
 
         // Retourner une réponse pour indiquer que l'e-mail a été envoyé
         return $this->render('base.html.twig');
