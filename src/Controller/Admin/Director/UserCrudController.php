@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Director;
 
 use App\Controller\Admin\Filter\UserRolesFilter;
 use App\Entity\User;
+use App\Form\ChangePasswordFormType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -17,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Exception\ForbiddenActionException;
 use EasyCorp\Bundle\EasyAdminBundle\Exception\InsufficientEntityPermissionException;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -24,6 +26,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TimezoneField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -34,7 +37,8 @@ class UserCrudController extends AbstractCrudController
 {
     public function __construct(
         private readonly Security $security,
-        private readonly RequestStack $request
+        private readonly RequestStack $request,
+        private readonly UserPasswordHasherInterface $passwordHasher
     )
     {
     }
@@ -81,6 +85,10 @@ class UserCrudController extends AbstractCrudController
                 ->setValue('Europe/Paris'),
             BooleanField::new('isApproved', 'Approuvé')
                 ->setPermission('ROLE_DIRECTOR'),
+            TextField::new('plainPassword', '')
+                ->setFormType(ChangePasswordFormType::class)
+                ->setFormTypeOption('mapped', false)
+                ->setFormTypeOption('validation_groups', 'edit')
         ];
 
         if (str_contains($this->request->getCurrentRequest()->query->get('crudControllerFqcn'), "UserCrudController")) {
@@ -160,11 +168,11 @@ class UserCrudController extends AbstractCrudController
             });
     }
 
-    public function resetPassword(AdminContext $adminContext, EntityManagerInterface $entityManager , UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
+    public function resetPassword(AdminContext $adminContext, EntityManagerInterface $entityManager): Response
     {
         $user = $adminContext->getEntity()->getInstance();
 
-        $user->setPassword($passwordHasher->hashPassword($user, '123'));
+        $user->setPassword($this->passwordHasher->hashPassword($user, '123'));
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -191,6 +199,12 @@ class UserCrudController extends AbstractCrudController
 
         if ($this->security->isGranted('ROLE_AGENT') && in_array('ROLE_AGENT', $roles)) {
             throw new ForbiddenActionException($context);
+        } elseif ($userData = $context->getRequest()->get('User')) {
+            // If plainPassword is provided, update the password
+            $plainPassword = $userData['plainPassword']['plainPassword']['first'];
+            if (!empty($plainPassword)) {
+                $entityInstance->setPassword($this->passwordHasher->hashPassword($entityInstance, $plainPassword));
+            }
         }
 
         return parent::edit($context);

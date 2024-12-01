@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ChangePasswordFormType extends AbstractType
 {
@@ -34,9 +35,13 @@ class ChangePasswordFormType extends AbstractType
                             'minMessage' => 'Your password should be at least {{ limit }} characters',
                             // max length allowed by Symfony for security reasons
                             'max' => 4096,
-                        ]),
-                        new PasswordStrength(),
-                        new NotCompromisedPassword(),
+                        ], groups: ['edit']),
+                        new Regex([
+                            'pattern' => '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).+$/',
+                            'message' => 'Your password should contain at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., #.?!@$%^&*-)'
+                        ], groups: ['edit']),
+//                        new PasswordStrength(groups: ['edit']),
+                        new NotCompromisedPassword(groups: ['edit']),
                     ],
                     'label' => 'New password',
                 ],
