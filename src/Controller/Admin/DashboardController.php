@@ -6,7 +6,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
-class DashboardController extends AbstractDashboardController
+abstract class DashboardController extends AbstractDashboardController
 {
     public function configureDashboard(): Dashboard
     {
