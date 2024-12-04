@@ -28,6 +28,8 @@ class AgentDashboardController extends DashboardController
     #[Route('/agent', name: 'agent_dashboard')]
     public function index(): Response
     {
+        $this->setDashboardControllerFqcnIfNotSet();
+
         return $this->render('admin/agent_dashboard.html.twig');
     }
 

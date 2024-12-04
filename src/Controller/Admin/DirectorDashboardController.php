@@ -6,21 +6,25 @@ use App\Controller\Admin\Director\AppointmentCrudController;
 use App\Controller\Admin\Director\FeatureCrudController;
 use App\Controller\Admin\Director\InquiryCrudController;
 use App\Controller\Admin\Director\NotificationCrudController;
-use App\Controller\Admin\Director\PropertyCrudController;
-use App\Controller\Admin\Director\UserCrudController;
 use App\Entity\Appointment;
 use App\Entity\Feature;
 use App\Entity\Inquiry;
 use App\Entity\Notification;
 use App\Entity\Property;
-use App\Entity\User;
-use App\Service\PasswordGenerator;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_DIRECTOR')]
+#[AdminDashboard(routes: [
+    'index' => ['routePath' => '/all'],
+    'new' => ['routePath' => '/create', 'routeName' => 'create'],
+    'edit' => ['routePath' => '/editing-{entityId}', 'routeName' => 'editing'],
+    'delete' => ['routePath' => '/remove/{entityId}'],
+    'detail' => ['routeName' => 'view'],
+])]
 class DirectorDashboardController extends DashboardController
 {
     #[Route('/director', name: 'director_dashboard')]
@@ -42,16 +46,16 @@ class DirectorDashboardController extends DashboardController
         // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
         // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
         //
+
+        $this->setDashboardControllerFqcnIfNotSet();
+
         return $this->render('admin/admin_dashboard.html.twig');
     }
 
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-user', User::class)
-            ->setController(UserCrudController::class);
-        yield MenuItem::linkToCrud('Propriétés', 'fas fa-city', Property::class)
-            ->setController(PropertyCrudController::class);
+        yield MenuItem::linkToCrud('Propriétés', 'fas fa-city', Property::class);
         yield MenuItem::linkToCrud('Caractéristiques', 'fas fa-cogs', Feature::class)
             ->setController(FeatureCrudController::class);
         yield MenuItem::linkToCrud('Rendez-vous', 'fas fa-calendar', Appointment::class)

@@ -10,8 +10,10 @@ use App\Entity\Appointment;
 use App\Entity\Inquiry;
 use App\Entity\Property;
 use App\Repository\NotificationRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -20,14 +22,19 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class CustomerDashboardController extends DashboardController
 {
     public function __construct(
+        RequestStack $requestStack,
         private readonly Security $security,
-        private readonly NotificationRepository $notificationRepository)
+        private readonly NotificationRepository $notificationRepository
+    )
     {
+        parent::__construct($requestStack);
     }
 
     #[Route('/customer', name: 'customer_dashboard')]
     public function index(): Response
     {
+        $this->setDashboardControllerFqcnIfNotSet();
+
         return $this->render('admin/customer_dashboard.html.twig');
     }
 
